@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: raw
+    database: LENDING_CLUB
+    schema: RAW
+    tables:
+      - name: loans_raw

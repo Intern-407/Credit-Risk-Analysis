@@ -1,0 +1,28 @@
+name: lendingclub_dbt
+version: 1.0.0
+config-version: 2
+profile: lendingclub_dbt
+model-paths:
+  - models
+analysis-paths:
+  - analyses
+test-paths:
+  - tests
+seed-paths:
+  - seeds
+macro-paths:
+  - macros
+snapshot-paths:
+  - snapshotsLENDING_CLUB.SILVER.STG_LOANS
+models:
+  lendingclub_dbt:
+    staging:
+      +materialized: view
+      +schema: SILVER
+      +post-hook:
+        - "{{ log_layer_audit('SILVER', this) }}"
+    marts:
+      +materialized: table
+      +schema: GOLD
+      +post-hook:
+        - "{{ log_layer_audit('GOLD', this) }}"

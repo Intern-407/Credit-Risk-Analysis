@@ -1,0 +1,85 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: >
+      Calendar dimension keyed on issue_date. Enables time-based slicing by year,
+      quarter, month, season, and half-year for BI dashboards.
+    columns:
+      - name: date_key
+        tests: [not_null, unique]
+
+  - name: dim_borrower
+    description: >
+      Borrower demographic profile. Combines employment stability, income tier,
+      home ownership, and verification status into a single dimension for
+      socioeconomic risk segmentation.
+    columns:
+      - name: borrower_key
+        tests: [not_null, unique]
+
+  - name: dim_geography
+    description: >
+      Geographic dimension with state, region, market size, regulatory environment,
+      and cost-of-living classifications for spatial credit risk analysis.
+    columns:
+      - name: state_code
+        tests: [not_null, unique]
+
+  - name: dim_purpose
+    description: >
+      Loan purpose dimension classifying borrower intent, portfolio strategy bucket,
+      and risk expectation by loan purpose.
+    columns:
+      - name: purpose_name
+        tests: [not_null, unique]
+
+  - name: dim_loan_status
+    description: >
+      Loan performance/outcome dimension with delinquency funnel stages,
+      IFRS9 staging, and loss severity classification.
+    columns:
+      - name: status_name
+        tests: [not_null, unique]
+
+  - name: dim_credit_profile
+    description: >
+      Credit risk tier dimension combining grade, sub-grade, and FICO-based risk
+      segment. The core dimension for credit risk BI analysis.
+    columns:
+      - name: credit_profile_key
+        tests: [not_null, unique]
+      - name: grade
+        tests:
+          - accepted_values:
+              values: ['A','B','C','D','E','F','G']
+
+  - name: dim_loan_terms
+    description: >
+      Product/origination terms dimension. Defines the loan's structural
+      characteristics: term length, rate band, and application type.
+    columns:
+      - name: loan_terms_key
+        tests: [not_null, unique]
+
+  - name: dim_vintage
+    description: >
+      Vintage cohort dimension for loan seasoning and cohort performance analysis.
+      The gold standard for credit risk portfolio monitoring.
+    columns:
+      - name: vintage_date_key
+        tests: [not_null, unique]
+
+  - name: fct_loans
+    description: >
+      Central fact table at loan-grain. Contains all financial measures and
+      foreign keys to every dimension. Star schema center for all BI reporting.
+    columns:
+      - name: loan_id
+        tests: [not_null, unique]
+      - name: is_default
+        tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: loan_amnt
+        tests: [not_null]

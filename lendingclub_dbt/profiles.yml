@@ -1,0 +1,10 @@
+lendingclub_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      role: ACCOUNTADMIN
+      warehouse: WH_LENDING
+      database: LENDING_CLUB
+      schema: STAGING
+      threads: 8

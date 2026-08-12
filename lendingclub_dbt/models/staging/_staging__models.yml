@@ -1,0 +1,48 @@
+version: 2
+models:
+  - name: int_loans_cleaned
+    description: >
+      Shared cleaning/validation/derivation layer. Not queried directly by
+      marts -- stg_loans and stg_loans_rejected both split off from this.
+    columns:
+      - name: loan_id
+        tests: [not_null]
+
+  - name: stg_loans
+    description: >
+      Analysis-ready, DQ-passed loan records. One row per loan_id.
+      Source for marts/ (Gold layer).
+    columns:
+      - name: loan_id
+        tests: [not_null, unique]
+      - name: grade
+        tests:
+          - accepted_values:
+              values: ['A','B','C','D','E','F','G']
+      - name: loan_status
+        tests:
+          - accepted_values:
+              values: ['Fully Paid','Current','Charged Off','Late (31-120 days)',
+                        'In Grace Period','Late (16-30 days)',
+                        'Does not meet the credit policy. Status:Fully Paid',
+                        'Does not meet the credit policy. Status:Charged Off','Default']
+      - name: is_default
+        tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: risk_segment
+        tests:
+          - accepted_values:
+              values: ['Prime', 'Near-Prime', 'Subprime', 'Deep-Subprime']
+      - name: loan_amnt
+        tests: [not_null]
+
+  - name: stg_loans_rejected
+    description: >
+      Loans that failed at least one DQ check in int_loans_cleaned, kept for
+      audit/reconciliation rather than silently dropped.
+    columns:
+      - name: loan_id
+        tests: [not_null]
+      - name: dq_fail_reasons
+        tests: [not_null]
